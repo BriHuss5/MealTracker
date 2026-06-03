@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brian's Meal Tracker</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  background: #f5f5f0; color: #222; padding: 14px;
+  max-width: 600px; margin: 0 auto; min-height: 100vh; padding-bottom: 30px;
+}
+header { background: #2c5f2d; color: white; padding: 14px 16px; border-radius: 12px; margin-bottom: 12px; }
+.header-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px; }
+h1 { font-size: 18px; }
+.live-time { font-size: 13px; opacity: 0.9; font-variant-numeric: tabular-nums; }
+.date-line { font-size: 12px; opacity: 0.85; }
+
+.controls { display: flex; gap: 6px; margin-bottom: 12px; }
+.day-btn {
+  flex: 1; padding: 9px 4px; border: 2px solid #2c5f2d;
+  background: white; color: #2c5f2d; border-radius: 8px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.day-btn.active { background: #2c5f2d; color: white; }
+
+.summary-card {
+  background: white; border-radius: 12px; padding: 14px;
+  margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.summary-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.summary-title { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+.cal-display { font-size: 13px; color: #444; }
+.cal-display strong { color: #2c5f2d; font-size: 16px; }
+.cal-track { background: #e8e8e0; height: 8px; border-radius: 4px; overflow: hidden; margin-bottom: 14px; }
+.cal-fill { background: #2c5f2d; height: 100%; transition: width 0.3s; border-radius: 4px; }
+.cal-fill.over { background: #d4a017; }
+
+.circles-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.circle-wrap { text-align: center; position: relative; }
+.circle-svg { width: 80px; height: 80px; margin: 0 auto; display: block; }
+.circle-bg { fill: none; stroke: #e8e8e0; stroke-width: 7; }
+.circle-fg { fill: none; stroke-width: 7; stroke-linecap: round; transform: rotate(-90deg); transform-origin: 40px 40px; transition: stroke-dashoffset 0.4s, stroke 0.3s; }
+.circle-pct {
+  position: absolute; top: 32px; left: 0; right: 0;
+  font-size: 14px; font-weight: 700; color: #1a1a1a;
+  font-variant-numeric: tabular-nums;
+}
+.circle-label { font-size: 11px; color: #888; font-weight: 600; text-transform: uppercase; margin-top: 4px; }
+.circle-value { font-size: 12px; color: #444; margin-top: 1px; font-weight: 600; }
+
+.fast-card {
+  background: white; border-radius: 12px; padding: 14px;
+  margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-left: 4px solid #2c5f2d;
+}
+.fast-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.fast-title { font-size: 13px; font-weight: 700; color: #2c5f2d; }
+.fast-time { font-size: 22px; font-weight: 700; color: #1a1a1a; font-variant-numeric: tabular-nums; }
+.fast-meta { font-size: 11px; color: #888; }
+.fast-controls { display: flex; gap: 8px; margin-top: 10px; }
+.fast-btn {
+  flex: 1; padding: 8px; border: 1px solid #2c5f2d;
+  background: white; color: #2c5f2d; border-radius: 6px;
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+.fast-btn.primary { background: #2c5f2d; color: white; }
+
+.section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 6px 4px; }
+
+.meal-card {
+  background: white; border-radius: 10px; padding: 12px;
+  margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex; align-items: flex-start; gap: 10px;
+  border-left: 3px solid #2c5f2d;
+}
+.meal-card.unchecked { opacity: 0.6; }
+.checkbox {
+  width: 26px; height: 26px; border: 2px solid #2c5f2d; border-radius: 6px;
+  flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: white;
+}
+.checkbox.checked { background: #2c5f2d; }
+.checkbox.checked::after { content: "✓"; color: white; font-weight: bold; font-size: 15px; }
+.meal-content { flex: 1; min-width: 0; }
+.meal-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
+.meal-time-badge { font-size: 11px; color: #2c5f2d; font-weight: 700; background: #e8f0e8; padding: 2px 7px; border-radius: 4px; }
+.meal-name { font-weight: 600; font-size: 13px; color: #1a1a1a; }
+.meal-desc { font-size: 12px; color: #555; line-height: 1.4; margin-top: 2px; }
+.meal-macros { font-size: 11px; color: #2c5f2d; margin-top: 5px; font-weight: 600; }
+.delete-btn { background: none; border: none; color: #c44; font-size: 14px; cursor: pointer; padding: 0 4px; }
+
+.add-meal-card {
+  background: white; border-radius: 12px; padding: 14px; margin-top: 10px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-left: 4px solid #d4a017;
+}
+.add-meal-card h3 { font-size: 13px; margin-bottom: 8px; color: #333; }
+.add-meal-card textarea {
+  width: 100%; min-height: 50px; padding: 9px; border: 1px solid #ddd;
+  border-radius: 6px; font-family: inherit; font-size: 13px; resize: vertical;
+}
+.time-input-row {
+  display: flex; gap: 6px; align-items: center; margin-top: 10px;
+  background: #f5f5f0; padding: 8px 10px; border-radius: 6px;
+}
+.time-input-row label { font-size: 12px; color: #555; font-weight: 600; }
+.time-input-row input[type="number"] {
+  width: 50px; padding: 5px 6px; border: 1px solid #ddd; border-radius: 4px;
+  font-size: 13px; text-align: center;
+}
+.ampm-toggle { display: flex; gap: 4px; }
+.ampm-btn {
+  padding: 5px 10px; border: 1px solid #ccc; background: white;
+  border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #888;
+}
+.ampm-btn.active { background: #2c5f2d; color: white; border-color: #2c5f2d; }
+.time-sep { font-weight: 700; color: #888; }
+.primary-btn {
+  background: #2c5f2d; color: white; border: none; padding: 10px;
+  border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%;
+}
+.primary-btn:disabled { background: #999; cursor: not-allowed; }
+
+.weight-card {
+  background: white; border-radius: 12px; padding: 14px;
+  margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.weight-card h3 { font-size: 13px; margin-bottom: 8px; color: #333; }
+.weight-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+.weight-row input { flex: 1; padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; }
+.weight-row button { padding: 8px 14px; background: #2c5f2d; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.weight-trend { font-size: 12px; color: #555; }
+.weight-trend .delta-down { color: #2c5f2d; font-weight: 700; }
+.weight-trend .delta-up { color: #d4a017; font-weight: 700; }
+.weight-history { font-size: 11px; color: #888; margin-top: 6px; }
+
+.suggest-card {
+  background: linear-gradient(135deg, #eaf4ea 0%, #f8f8f0 100%);
+  border-radius: 12px; padding: 14px; margin-top: 12px;
+  border: 1px solid #c8d8c8;
+}
+.suggest-card h3 { font-size: 13px; color: #2c5f2d; margin-bottom: 6px; }
+.suggest-text { font-size: 13px; color: #333; line-height: 1.5; }
+.suggest-refresh { background: none; border: none; color: #2c5f2d; font-size: 11px; cursor: pointer; margin-top: 6px; font-weight: 600; }
+
+.report-card {
+  background: white; border-radius: 12px; padding: 14px; margin-top: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-left: 4px solid #2c5f2d;
+}
+.report-card h3 { font-size: 13px; color: #2c5f2d; margin-bottom: 6px; }
+.report-card p { font-size: 12px; color: #555; margin-bottom: 8px; }
+
+.reset-btn { background: none; border: 1px solid #ccc; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #777; cursor: pointer; }
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: #2c5f2d; color: white; padding: 10px 18px; border-radius: 8px;
+  font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100;
+}
+.toast.show { opacity: 1; }
+.spinner {
+  display: inline-block; width: 12px; height: 12px;
+  border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%;
+  animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.date-display { display: flex; justify-content: flex-end; margin-bottom: 8px; padding: 0 4px; }
+.empty-state { color: #999; font-size: 12px; padding: 10px 4px; font-style: italic; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>🍳 Meal Tracker</h1>
+    <div class="live-time" id="liveTime">--:-- --</div>
+  </div>
+  <div class="date-line" id="dateLabel">Loading...</div>
+</header>
+
+<div class="controls">
+  <button class="day-btn" data-day="work" onclick="setDayType('work')">Work</button>
+  <button class="day-btn" data-day="nonwork" onclick="setDayType('nonwork')">Non-Work</button>
+  <button class="day-btn" data-day="rest" onclick="setDayType('rest')">Rest</button>
+</div>
+
+<div class="summary-card">
+  <div class="summary-top">
+    <div class="summary-title">Today's Intake</div>
+    <div class="cal-display"><strong id="totalCal">0</strong> / <span id="targetCal">2,590</span> cal</div>
+  </div>
+  <div class="cal-track"><div class="cal-fill" id="calFill" style="width:0%"></div></div>
+  <div class="circles-row">
+    <div class="circle-wrap">
+      <svg class="circle-svg" viewBox="0 0 80 80">
+        <circle class="circle-bg" cx="40" cy="40" r="33"></circle>
+        <circle class="circle-fg" id="proteinCircle" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="207.3"></circle>
+      </svg>
+      <div class="circle-pct" id="proteinPct">0%</div>
+      <div class="circle-label">Protein</div>
+      <div class="circle-value" id="proteinValue">0 / 233g</div>
+    </div>
+    <div class="circle-wrap">
+      <svg class="circle-svg" viewBox="0 0 80 80">
+        <circle class="circle-bg" cx="40" cy="40" r="33"></circle>
+        <circle class="circle-fg" id="carbsCircle" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="207.3"></circle>
+      </svg>
+      <div class="circle-pct" id="carbsPct">0%</div>
+      <div class="circle-label">Carbs</div>
+      <div class="circle-value" id="carbsValue">0 / 208g</div>
+    </div>
+    <div class="circle-wrap">
+      <svg class="circle-svg" viewBox="0 0 80 80">
+        <circle class="circle-bg" cx="40" cy="40" r="33"></circle>
+        <circle class="circle-fg" id="fatCircle" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="207.3"></circle>
+      </svg>
+      <div class="circle-pct" id="fatPct">0%</div>
+      <div class="circle-label">Fat</div>
+      <div class="circle-value" id="fatValue">0 / 81g</div>
+    </div>
+  </div>
+</div>
+
+<div class="fast-card">
+  <div class="fast-header">
+    <div>
+      <div class="fast-title">⏱ Fasting Timer</div>
+      <div class="fast-meta" id="fastMeta">Not currently fasting</div>
+    </div>
+    <div class="fast-time" id="fastTime">--:--:--</div>
+  </div>
+  <div class="fast-controls">
+    <button class="fast-btn primary" id="fastStartBtn" onclick="toggleFast()">Start Fast</button>
+    <button class="fast-btn" onclick="resetFast()">Reset</button>
+  </div>
+</div>
+
+<div class="section-label">Logged Meals</div>
+<div id="customMealsList"></div>
+
+<div class="add-meal-card">
+  <h3>➕ Log a meal</h3>
+  <textarea id="mealInput" placeholder="e.g., 3 scrambled eggs, 1 cup blueberries, 1 slice sourdough with butter"></textarea>
+  <div class="time-input-row">
+    <label>Eaten at:</label>
+    <input type="number" id="timeHour" min="1" max="12" placeholder="HH">
+    <span class="time-sep">:</span>
+    <input type="number" id="timeMin" min="0" max="59" placeholder="MM">
+    <div class="ampm-toggle">
+      <button class="ampm-btn active" id="ampmAM" onclick="setAMPM('AM')">AM</button>
+      <button class="ampm-btn" id="ampmPM" onclick="setAMPM('PM')">PM</button>
+    </div>
+  </div>
+  <button class="primary-btn" id="addBtn" onclick="addCustomMeal()">Calculate &amp; Log</button>
+</div>
+
+<div class="suggest-card">
+  <h3>💡 Today's Micronutrient Tip</h3>
+  <div class="suggest-text" id="suggestText">Log a few meals to get a personalized suggestion based on what you've eaten today.</div>
+  <button class="suggest-refresh" onclick="getSuggestion()">↻ Refresh suggestion</button>
+</div>
+
+<div class="weight-card">
+  <h3>⚖️ Weigh-In</h3>
+  <div class="weight-row">
+    <input type="number" id="weightInput" placeholder="lbs (e.g., 203.4)" step="0.1">
+  </div>
+  <div class="time-input-row">
+    <label>Time:</label>
+    <input type="number" id="weightHour" min="1" max="12" placeholder="HH">
+    <span class="time-sep">:</span>
+    <input type="number" id="weightMin" min="0" max="59" placeholder="MM">
+    <div class="ampm-toggle">
+      <button class="ampm-btn active" id="weightAM" onclick="setWeightAMPM('AM')">AM</button>
+      <button class="ampm-btn" id="weightPM" onclick="setWeightAMPM('PM')">PM</button>
+    </div>
+  </div>
+  <button class="primary-btn" onclick="logWeight()">Log Weigh-In</button>
+  <div class="weight-trend" id="weightTrend" style="margin-top:10px;">No weight logged yet.</div>
+</div>
+
+<div class="report-card">
+  <h3>📊 Weekly Report</h3>
+  <p>Generate a 7-day summary with daily macros, fasting averages, and weigh-ins. Opens in your mail app pre-filled.</p>
+  <button class="primary-btn" onclick="generateWeeklyReport()">Email Weekly Report</button>
+</div>
+
+<div class="date-display">
+  <button class="reset-btn" onclick="resetDay()">Reset today's meals</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Day targets (no planned meals, just goals)
+const DAY_TARGETS = {
+  work:    { label: "Work Day",     cal: 2590, protein: 233, fat: 81, carbs: 208 },
+  nonwork: { label: "Non-Work Day", cal: 2540, protein: 180, fat: 96, carbs: 230 },
+  rest:    { label: "Rest Day",     cal: 2100, protein: 135, fat: 80, carbs: 180 }
+};
+
+const REPORT_EMAIL = "bphusseyiii@gmail.com";
+
+let currentDay = "work";
+let customMeals = [];
+let fastStart = null;
+let fastHistory = []; // [{start, end, durationMin}]
+let weights = []; // [{date, lbs, time}]
+let lastSuggestionDate = null;
+let lastSuggestionText = "";
+let mealAMPM = "AM";
+let weightAMPM = "AM";
+
+function getTodayKey() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function dateKeyFromDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+async function loadState() {
+  try {
+    const r = await window.storage.get("tracker:" + getTodayKey());
+    if (r) {
+      const d = JSON.parse(r.value);
+      currentDay = d.currentDay || "work";
+      customMeals = d.customMeals || [];
+    }
+  } catch (e) {}
+  try {
+    const r = await window.storage.get("tracker:fast");
+    if (r) fastStart = JSON.parse(r.value).start;
+  } catch (e) {}
+  try {
+    const r = await window.storage.get("tracker:fastHistory");
+    if (r) fastHistory = JSON.parse(r.value);
+  } catch (e) {}
+  try {
+    const r = await window.storage.get("tracker:weights");
+    if (r) weights = JSON.parse(r.value);
+  } catch (e) {}
+  try {
+    const r = await window.storage.get("tracker:suggestion");
+    if (r) {
+      const d = JSON.parse(r.value);
+      lastSuggestionDate = d.date;
+      lastSuggestionText = d.text;
+    }
+  } catch (e) {}
+}
+
+async function saveDayState(dayKey) {
+  const key = dayKey || ("tracker:" + getTodayKey());
+  try {
+    await window.storage.set(key, JSON.stringify({ currentDay, customMeals }));
+  } catch (e) { console.error(e); }
+}
+async function saveFast() {
+  try { await window.storage.set("tracker:fast", JSON.stringify({ start: fastStart })); } catch (e) {}
+}
+async function saveFastHistory() {
+  try { await window.storage.set("tracker:fastHistory", JSON.stringify(fastHistory)); } catch (e) {}
+}
+async function saveWeights() {
+  try { await window.storage.set("tracker:weights", JSON.stringify(weights)); } catch (e) {}
+}
+async function saveSuggestion() {
+  try { await window.storage.set("tracker:suggestion", JSON.stringify({ date: lastSuggestionDate, text: lastSuggestionText })); } catch (e) {}
+}
+
+function autoDetectDay() {
+  const d = new Date().getDay();
+  if (d === 6) return "rest";
+  if (d === 1 || d === 2 || d === 4) return "work";
+  return "nonwork";
+}
+
+function calculateTotals() {
+  let t = { cal: 0, protein: 0, fat: 0, carbs: 0 };
+  customMeals.forEach(m => {
+    if (m.checked) {
+      t.cal += m.macros.cal; t.protein += m.macros.protein;
+      t.fat += m.macros.fat; t.carbs += m.macros.carbs;
+    }
+  });
+  return t;
+}
+
+function macroColor(pct) {
+  if (pct < 50) return "#d44";
+  if (pct < 85) return "#d4a017";
+  if (pct <= 115) return "#2c8c2d";
+  return "#d44";
+}
+
+function setCircle(elemId, pctElemId, pct) {
+  const circumference = 207.3;
+  const fillPct = Math.min(pct, 100);
+  const offset = circumference - (circumference * fillPct / 100);
+  const c = document.getElementById(elemId);
+  c.style.strokeDashoffset = offset;
+  c.style.stroke = macroColor(pct);
+  document.getElementById(pctElemId).textContent = Math.round(pct) + "%";
+  document.getElementById(pctElemId).style.color = macroColor(pct);
+}
+
+function updateLiveTime() {
+  const now = new Date();
+  document.getElementById("liveTime").textContent = now.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  document.getElementById("dateLabel").textContent = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+}
+
+function formatDuration(ms) {
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function updateFastTimer() {
+  if (!fastStart) {
+    document.getElementById("fastTime").textContent = "--:--:--";
+    document.getElementById("fastMeta").textContent = "Not currently fasting";
+    document.getElementById("fastStartBtn").textContent = "Start Fast";
+    document.getElementById("fastStartBtn").classList.add("primary");
+    return;
+  }
+  const elapsed = Date.now() - fastStart;
+  document.getElementById("fastTime").textContent = formatDuration(elapsed);
+  const targetHrs = 15;
+  const progressHrs = elapsed / 3600000;
+  let meta;
+  if (progressHrs < targetHrs) {
+    meta = `${(targetHrs - progressHrs).toFixed(1)}h until 15h goal`;
+  } else {
+    meta = `✓ Hit ${targetHrs}h goal · still fasting`;
+  }
+  document.getElementById("fastMeta").textContent = meta;
+  document.getElementById("fastStartBtn").textContent = "End Fast";
+  document.getElementById("fastStartBtn").classList.remove("primary");
+}
+
+async function toggleFast() {
+  if (fastStart) {
+    const end = Date.now();
+    const durationMin = Math.round((end - fastStart) / 60000);
+    fastHistory.push({ start: fastStart, end: end, durationMin: durationMin });
+    await saveFastHistory();
+    fastStart = null;
+    showToast(`Fast ended: ${(durationMin / 60).toFixed(1)}h`);
+  } else {
+    fastStart = Date.now();
+    showToast("Fast started");
+  }
+  await saveFast();
+  updateFastTimer();
+}
+
+async function resetFast() {
+  if (!confirm("Reset the current fast timer? (Won't affect history)")) return;
+  fastStart = null;
+  await saveFast();
+  updateFastTimer();
+}
+
+function setAMPM(val) {
+  mealAMPM = val;
+  document.getElementById("ampmAM").classList.toggle("active", val === "AM");
+  document.getElementById("ampmPM").classList.toggle("active", val === "PM");
+}
+
+function setWeightAMPM(val) {
+  weightAMPM = val;
+  document.getElementById("weightAM").classList.toggle("active", val === "AM");
+  document.getElementById("weightPM").classList.toggle("active", val === "PM");
+}
+
+function buildTimeLabel(hour, min, ampm) {
+  if (!hour) return null;
+  const h = parseInt(hour);
+  const m = parseInt(min) || 0;
+  if (h < 1 || h > 12 || m < 0 || m > 59) return null;
+  return `${h}:${String(m).padStart(2,"0")} ${ampm}`;
+}
+
+function render() {
+  document.querySelectorAll(".day-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.day === currentDay);
+  });
+
+  const customList = document.getElementById("customMealsList");
+  customList.innerHTML = "";
+  if (customMeals.length === 0) {
+    customList.innerHTML = '<div class="empty-state">No meals logged yet — use the form below to log what you eat throughout the day.</div>';
+  } else {
+    // sort by logged order (just keep array order, newest at bottom)
+    customMeals.forEach((meal, idx) => {
+      const card = document.createElement("div");
+      card.className = "meal-card" + (meal.checked ? "" : " unchecked");
+      const timeLabel = meal.time || "Logged";
+      card.innerHTML = `
+        <div class="checkbox ${meal.checked ? "checked" : ""}" onclick="toggleCustomMeal(${idx})"></div>
+        <div class="meal-content">
+          <div class="meal-header"><span class="meal-time-badge">${timeLabel}</span><button class="delete-btn" onclick="deleteCustomMeal(${idx})">✕</button></div>
+          <div class="meal-name">${meal.name}</div>
+          <div class="meal-desc">${meal.desc || ""}</div>
+          <div class="meal-macros">${meal.macros.cal} cal · ${meal.macros.protein}P · ${meal.macros.fat}F · ${meal.macros.carbs}C</div>
+        </div>
+      `;
+      customList.appendChild(card);
+    });
+  }
+
+  const totals = calculateTotals();
+  const tg = DAY_TARGETS[currentDay];
+  document.getElementById("totalCal").textContent = totals.cal.toLocaleString();
+  document.getElementById("targetCal").textContent = tg.cal.toLocaleString();
+  document.getElementById("proteinValue").textContent = `${totals.protein} / ${tg.protein}g`;
+  document.getElementById("carbsValue").textContent = `${totals.carbs} / ${tg.carbs}g`;
+  document.getElementById("fatValue").textContent = `${totals.fat} / ${tg.fat}g`;
+
+  const calPct = (totals.cal / tg.cal) * 100;
+  const calFill = document.getElementById("calFill");
+  calFill.style.width = Math.min(calPct, 100) + "%";
+  calFill.classList.toggle("over", totals.cal > tg.cal);
+
+  setCircle("proteinCircle", "proteinPct", (totals.protein / tg.protein) * 100);
+  setCircle("carbsCircle", "carbsPct", (totals.carbs / tg.carbs) * 100);
+  setCircle("fatCircle", "fatPct", (totals.fat / tg.fat) * 100);
+
+  renderWeightTrend();
+
+  if (lastSuggestionText && lastSuggestionDate === getTodayKey()) {
+    document.getElementById("suggestText").textContent = lastSuggestionText;
+  }
+}
+
+function renderWeightTrend() {
+  const el = document.getElementById("weightTrend");
+  if (weights.length === 0) {
+    el.textContent = "No weight logged yet.";
+    return;
+  }
+  const latest = weights[weights.length - 1];
+  const latestDate = new Date(latest.date);
+  let html = `Latest: <strong>${latest.lbs} lbs</strong> · ${latestDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
+  if (latest.time) html += ` at ${latest.time}`;
+  const weekAgo = Date.now() - 7 * 86400000;
+  const oldEntry = [...weights].reverse().find(w => new Date(w.date).getTime() < weekAgo);
+  if (oldEntry) {
+    const delta = (latest.lbs - oldEntry.lbs).toFixed(1);
+    const cls = delta < 0 ? "delta-down" : "delta-up";
+    const sign = delta > 0 ? "+" : "";
+    html += `<br>7-day change: <span class="${cls}">${sign}${delta} lbs</span>`;
+  }
+  el.innerHTML = html;
+}
+
+function toggleCustomMeal(idx) { customMeals[idx].checked = !customMeals[idx].checked; saveDayState(); render(); }
+function deleteCustomMeal(idx) {
+  if (!confirm("Remove this meal?")) return;
+  customMeals.splice(idx, 1); saveDayState(); render();
+}
+async function setDayType(type) { currentDay = type; await saveDayState(); render(); }
+function resetDay() {
+  if (!confirm("Clear all meals logged today?")) return;
+  customMeals = []; saveDayState(); render(); showToast("Day reset");
+}
+
+async function addCustomMeal() {
+  const input = document.getElementById("mealInput");
+  const hourInput = document.getElementById("timeHour");
+  const minInput = document.getElementById("timeMin");
+  const text = input.value.trim();
+  if (!text) { showToast("Enter a meal description first"); return; }
+
+  const btn = document.getElementById("addBtn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Calculating...';
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 500,
+        messages: [{
+          role: "user",
+          content: `Estimate macros. Return ONLY JSON, no markdown:
+{"name": "short name 3-6 words", "desc": "brief description", "cal": <int>, "protein": <int g>, "fat": <int g>, "carbs": <int g>}
+
+Food: ${text}`
+        }]
+      })
+    });
+    const data = await response.json();
+    let resultText = data.content.map(c => c.text || "").join("").trim();
+    resultText = resultText.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(resultText);
+
+    // Build time label
+    let timeLabel = buildTimeLabel(hourInput.value, minInput.value, mealAMPM);
+    if (!timeLabel) {
+      // default to current time
+      const now = new Date();
+      const h = now.getHours();
+      const m = now.getMinutes();
+      const ampm = h >= 12 ? "PM" : "AM";
+      const h12 = h % 12 || 12;
+      timeLabel = `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+    }
+
+    customMeals.push({
+      name: parsed.name,
+      desc: parsed.desc,
+      time: timeLabel,
+      loggedAt: new Date().toISOString(),
+      macros: {
+        cal: Math.round(parsed.cal),
+        protein: Math.round(parsed.protein),
+        fat: Math.round(parsed.fat),
+        carbs: Math.round(parsed.carbs)
+      },
+      checked: true
+    });
+    await saveDayState();
+    input.value = "";
+    hourInput.value = "";
+    minInput.value = "";
+    render();
+    showToast(`Added at ${timeLabel}: ${parsed.cal} cal · ${parsed.protein}g P`);
+  } catch (err) {
+    console.error(err);
+    showToast("Couldn't calculate — try again");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "Calculate &amp; Log";
+  }
+}
+
+async function logWeight() {
+  const input = document.getElementById("weightInput");
+  const hourInput = document.getElementById("weightHour");
+  const minInput = document.getElementById("weightMin");
+  const val = parseFloat(input.value);
+  if (!val || val < 50 || val > 500) { showToast("Enter a valid weight"); return; }
+
+  let timeLabel = buildTimeLabel(hourInput.value, minInput.value, weightAMPM);
+  if (!timeLabel) {
+    const now = new Date();
+    const h = now.getHours();
+    const m = now.getMinutes();
+    const ampm = h >= 12 ? "PM" : "AM";
+    const h12 = h % 12 || 12;
+    timeLabel = `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+  }
+
+  weights.push({ date: new Date().toISOString(), lbs: val, time: timeLabel });
+  await saveWeights();
+  input.value = "";
+  hourInput.value = "";
+  minInput.value = "";
+  render();
+  showToast(`Logged ${val} lbs at ${timeLabel}`);
+}
+
+async function getSuggestion() {
+  const el = document.getElementById("suggestText");
+  el.innerHTML = '<span class="spinner" style="color:#2c5f2d"></span>Thinking...';
+
+  const eaten = customMeals.filter(m => m.checked).map(m => m.desc || m.name);
+  const eatenText = eaten.length > 0 ? eaten.join("; ") : "nothing yet";
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 200,
+        messages: [{
+          role: "user",
+          content: `Based on what this person has eaten today, suggest ONE specific food or addition to improve their micronutrient profile. Focus on what's missing — leafy greens, omega-3s, B vitamins, magnesium, etc. Keep it to 2-3 sentences. Be specific about the food and what micronutrient gap it fills. Do not greet, do not preamble, just give the tip.
+
+Eaten today: ${eatenText}`
+        }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content.map(c => c.text || "").join("").trim();
+    lastSuggestionText = text;
+    lastSuggestionDate = getTodayKey();
+    await saveSuggestion();
+    el.textContent = text;
+  } catch (err) {
+    console.error(err);
+    el.textContent = "Couldn't load suggestion — try again.";
+  }
+}
+
+async function generateWeeklyReport() {
+  showToast("Building report...");
+  // Pull last 7 days of meal data
+  const days = [];
+  const today = new Date();
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = "tracker:" + dateKeyFromDate(d);
+    let dayData = { date: d, meals: [], dayType: "?" };
+    try {
+      const r = await window.storage.get(key);
+      if (r) {
+        const data = JSON.parse(r.value);
+        dayData.meals = data.customMeals || [];
+        dayData.dayType = data.currentDay || "?";
+      }
+    } catch (e) {}
+    // calc totals
+    let t = { cal: 0, protein: 0, fat: 0, carbs: 0 };
+    dayData.meals.forEach(m => {
+      if (m.checked) {
+        t.cal += m.macros.cal; t.protein += m.macros.protein;
+        t.fat += m.macros.fat; t.carbs += m.macros.carbs;
+      }
+    });
+    dayData.totals = t;
+    days.push(dayData);
+  }
+
+  // Fasting data — past 7 days
+  const sevenDaysAgo = Date.now() - 7 * 86400000;
+  const recentFasts = fastHistory.filter(f => f.end >= sevenDaysAgo);
+  const totalFastMin = recentFasts.reduce((s, f) => s + f.durationMin, 0);
+  const avgFastHrs = recentFasts.length > 0 ? (totalFastMin / recentFasts.length / 60).toFixed(1) : "—";
+  const fastCount = recentFasts.length;
+
+  // Weights — past 7 days
+  const recentWeights = weights.filter(w => new Date(w.date).getTime() >= sevenDaysAgo);
+
+  // Averages
+  const daysWithData = days.filter(d => d.totals.cal > 0);
+  const avgCal = daysWithData.length ? Math.round(daysWithData.reduce((s,d) => s + d.totals.cal, 0) / daysWithData.length) : 0;
+  const avgP = daysWithData.length ? Math.round(daysWithData.reduce((s,d) => s + d.totals.protein, 0) / daysWithData.length) : 0;
+  const avgF = daysWithData.length ? Math.round(daysWithData.reduce((s,d) => s + d.totals.fat, 0) / daysWithData.length) : 0;
+  const avgC = daysWithData.length ? Math.round(daysWithData.reduce((s,d) => s + d.totals.carbs, 0) / daysWithData.length) : 0;
+
+  // Build email body
+  const dateRange = `${days[0].date.toLocaleDateString("en-US",{month:"short",day:"numeric"})} - ${days[6].date.toLocaleDateString("en-US",{month:"short",day:"numeric"})}`;
+  let body = `WEEKLY MEAL TRACKER REPORT\n${dateRange}\n`;
+  body += `${"=".repeat(40)}\n\n`;
+
+  body += `WEEKLY AVERAGES (logged days only)\n`;
+  body += `  Calories: ${avgCal}\n`;
+  body += `  Protein:  ${avgP}g\n`;
+  body += `  Fat:      ${avgF}g\n`;
+  body += `  Carbs:    ${avgC}g\n\n`;
+
+  body += `DAY-BY-DAY BREAKDOWN\n`;
+  body += `${"-".repeat(40)}\n`;
+  days.forEach(d => {
+    const dayName = d.date.toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric"});
+    const dayLabel = DAY_TARGETS[d.dayType] ? DAY_TARGETS[d.dayType].label : "?";
+    body += `\n${dayName} (${dayLabel})\n`;
+    if (d.totals.cal === 0) {
+      body += `  No meals logged\n`;
+    } else {
+      body += `  Cal: ${d.totals.cal} | P: ${d.totals.protein}g | F: ${d.totals.fat}g | C: ${d.totals.carbs}g\n`;
+      body += `  Meals:\n`;
+      d.meals.filter(m => m.checked).forEach(m => {
+        body += `    - ${m.time || "?"} - ${m.name} (${m.macros.cal} cal, ${m.macros.protein}P)\n`;
+      });
+    }
+  });
+
+  body += `\n${"-".repeat(40)}\n`;
+  body += `FASTING (past 7 days)\n`;
+  body += `  Completed fasts: ${fastCount}\n`;
+  body += `  Average duration: ${avgFastHrs}h\n`;
+  if (recentFasts.length > 0) {
+    body += `  Recent fasts:\n`;
+    recentFasts.slice(-5).forEach(f => {
+      const start = new Date(f.start);
+      const end = new Date(f.end);
+      body += `    - ${start.toLocaleDateString("en-US",{month:"numeric",day:"numeric"})} ${start.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})} → ${end.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})} (${(f.durationMin/60).toFixed(1)}h)\n`;
+    });
+  }
+
+  body += `\n${"-".repeat(40)}\n`;
+  body += `WEIGH-INS (past 7 days)\n`;
+  if (recentWeights.length === 0) {
+    body += `  No weigh-ins logged\n`;
+  } else {
+    recentWeights.forEach(w => {
+      const d = new Date(w.date);
+      body += `  ${d.toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric"})} at ${w.time || "?"} — ${w.lbs} lbs\n`;
+    });
+    if (recentWeights.length >= 2) {
+      const first = recentWeights[0];
+      const last = recentWeights[recentWeights.length - 1];
+      const delta = (last.lbs - first.lbs).toFixed(1);
+      body += `  Net change: ${delta > 0 ? "+" : ""}${delta} lbs\n`;
+    }
+  }
+
+  body += `\n${"=".repeat(40)}\n`;
+  body += `Generated ${new Date().toLocaleString("en-US")}\n`;
+
+  const subject = `Weekly Meal Report — ${dateRange}`;
+  const mailto = `mailto:${REPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  window.location.href = mailto;
+}
+
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+function maybeRefreshSuggestion() {
+  if (lastSuggestionDate !== getTodayKey()) {
+    if (lastSuggestionDate) {
+      lastSuggestionText = "";
+      document.getElementById("suggestText").textContent = "Tap refresh to get today's tip based on what you've eaten.";
+    }
+  }
+}
+
+(async () => {
+  await loadState();
+  if (customMeals.length === 0) {
+    currentDay = autoDetectDay();
+  }
+  updateLiveTime();
+  updateFastTimer();
+  maybeRefreshSuggestion();
+  render();
+
+  setInterval(updateLiveTime, 30000);
+  setInterval(updateFastTimer, 1000);
+})();
+</script>
+
+</body>
+</html>
