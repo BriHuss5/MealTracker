@@ -48,18 +48,29 @@ h1 { font-size: 18px; }
 .fast-title { font-size: 13px; font-weight: 700; color: #2c5f2d; }
 .fast-time { font-size: 22px; font-weight: 700; color: #1a1a1a; font-variant-numeric: tabular-nums; }
 .fast-meta { font-size: 11px; color: #888; }
-.fast-controls { display: flex; gap: 8px; margin-top: 10px; }
-.fast-btn { flex: 1; padding: 8px; border: 1px solid #2c5f2d; background: white; color: #2c5f2d; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.fast-controls { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.fast-btn { flex: 1; min-width: 80px; padding: 8px; border: 1px solid #2c5f2d; background: white; color: #2c5f2d; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; }
 .fast-btn.primary { background: #2c5f2d; color: white; }
+.fast-manual {
+  display: none; background: #f5f5f0; padding: 10px; border-radius: 6px;
+  margin-top: 10px;
+}
+.fast-manual.open { display: block; }
+.fast-manual h4 { font-size: 12px; margin-bottom: 6px; color: #555; }
+.fast-manual-row { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
+.fast-manual-row label { font-size: 11px; color: #666; min-width: 50px; }
+.fast-manual-row input { padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; }
 .section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin: 14px 0 6px 4px; }
 .meal-card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); display: flex; align-items: flex-start; gap: 10px; border-left: 3px solid #2c5f2d; }
 .meal-card.unchecked { opacity: 0.6; }
+.meal-card.photo { border-left-color: #d4a017; }
 .checkbox { width: 26px; height: 26px; border: 2px solid #2c5f2d; border-radius: 6px; flex-shrink: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; background: white; }
 .checkbox.checked { background: #2c5f2d; }
 .checkbox.checked::after { content: "✓"; color: white; font-weight: bold; font-size: 15px; }
 .meal-content { flex: 1; min-width: 0; }
 .meal-header { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 3px; flex-wrap: wrap; }
 .meal-time-badge { font-size: 11px; color: #2c5f2d; font-weight: 700; background: #e8f0e8; padding: 2px 7px; border-radius: 4px; }
+.meal-time-badge.photo { background: #fff4d4; color: #8a6d10; }
 .meal-name { font-weight: 600; font-size: 13px; color: #1a1a1a; }
 .meal-desc { font-size: 12px; color: #555; line-height: 1.4; margin-top: 2px; }
 .meal-macros { font-size: 11px; color: #2c5f2d; margin-top: 5px; font-weight: 600; }
@@ -67,7 +78,7 @@ h1 { font-size: 18px; }
 .add-meal-card { background: white; border-radius: 12px; padding: 14px; margin-top: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); border-left: 4px solid #d4a017; }
 .add-meal-card h3 { font-size: 13px; margin-bottom: 8px; color: #333; }
 .add-meal-card textarea { width: 100%; min-height: 50px; padding: 9px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit; font-size: 13px; resize: vertical; }
-.time-input-row { display: flex; gap: 6px; align-items: center; margin-top: 10px; background: #f5f5f0; padding: 8px 10px; border-radius: 6px; }
+.time-input-row { display: flex; gap: 6px; align-items: center; margin-top: 10px; background: #f5f5f0; padding: 8px 10px; border-radius: 6px; flex-wrap: wrap; }
 .time-input-row label { font-size: 12px; color: #555; font-weight: 600; }
 .time-input-row input[type="number"] { width: 50px; padding: 5px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; text-align: center; }
 .ampm-toggle { display: flex; gap: 4px; }
@@ -76,6 +87,15 @@ h1 { font-size: 18px; }
 .time-sep { font-weight: 700; color: #888; }
 .primary-btn { background: #2c5f2d; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; width: 100%; }
 .primary-btn:disabled { background: #999; cursor: not-allowed; }
+.button-row { display: flex; gap: 8px; margin-top: 8px; }
+.button-row button { flex: 1; }
+.secondary-btn { background: #d4a017; color: white; border: none; padding: 10px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.secondary-btn:disabled { background: #ccc; cursor: not-allowed; }
+.photo-preview {
+  margin-top: 8px; max-width: 100%; max-height: 200px; border-radius: 6px; display: none;
+}
+.photo-preview.show { display: block; }
+.hidden-input { display: none; }
 .weight-card { background: white; border-radius: 12px; padding: 14px; margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .weight-card h3 { font-size: 13px; margin-bottom: 8px; color: #333; }
 .weight-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
@@ -91,7 +111,7 @@ h1 { font-size: 18px; }
 .report-card h3 { font-size: 13px; color: #2c5f2d; margin-bottom: 6px; }
 .report-card p { font-size: 12px; color: #555; margin-bottom: 8px; }
 .reset-btn { background: none; border: 1px solid #ccc; padding: 4px 10px; border-radius: 6px; font-size: 11px; color: #777; cursor: pointer; }
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2c5f2d; color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2c5f2d; color: white; padding: 10px 18px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 100; max-width: 90%; text-align: center; }
 .toast.show { opacity: 1; }
 .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -110,19 +130,18 @@ h1 { font-size: 18px; }
 </header>
 
 <div id="setupWarning" class="setup-warning" style="display:none;">
-  ⚠️ <strong>Setup needed:</strong> Edit this file and replace <code>WORKER_URL_HERE</code> at the top of the script with your Cloudflare Worker URL to enable AI macro estimation.
+  ⚠️ <strong>Setup needed:</strong> Edit this file and replace <code>WORKER_URL_HERE</code> at the top of the script with your Cloudflare Worker URL.
 </div>
 
 <div class="controls">
-  <button class="day-btn" data-day="work" onclick="setDayType('work')">Work</button>
-  <button class="day-btn" data-day="nonwork" onclick="setDayType('nonwork')">Non-Work</button>
-  <button class="day-btn" data-day="rest" onclick="setDayType('rest')">Rest</button>
+  <button class="day-btn" data-day="work" onclick="setDayType('work')">Work Day</button>
+  <button class="day-btn" data-day="nonwork" onclick="setDayType('nonwork')">Non-Work Day</button>
 </div>
 
 <div class="summary-card">
   <div class="summary-top">
     <div class="summary-title">Today's Intake</div>
-    <div class="cal-display"><strong id="totalCal">0</strong> / <span id="targetCal">2,590</span> cal</div>
+    <div class="cal-display"><strong id="totalCal">0</strong> / <span id="targetCal">2,565</span> cal</div>
   </div>
   <div class="cal-track"><div class="cal-fill" id="calFill" style="width:0%"></div></div>
   <div class="circles-row">
@@ -133,7 +152,7 @@ h1 { font-size: 18px; }
       </svg>
       <div class="circle-pct" id="proteinPct">0%</div>
       <div class="circle-label">Protein</div>
-      <div class="circle-value" id="proteinValue">0 / 233g</div>
+      <div class="circle-value" id="proteinValue">0 / 205g</div>
     </div>
     <div class="circle-wrap">
       <svg class="circle-svg" viewBox="0 0 80 80">
@@ -142,7 +161,7 @@ h1 { font-size: 18px; }
       </svg>
       <div class="circle-pct" id="carbsPct">0%</div>
       <div class="circle-label">Carbs</div>
-      <div class="circle-value" id="carbsValue">0 / 208g</div>
+      <div class="circle-value" id="carbsValue">0 / 220g</div>
     </div>
     <div class="circle-wrap">
       <svg class="circle-svg" viewBox="0 0 80 80">
@@ -151,7 +170,7 @@ h1 { font-size: 18px; }
       </svg>
       <div class="circle-pct" id="fatPct">0%</div>
       <div class="circle-label">Fat</div>
-      <div class="circle-value" id="fatValue">0 / 81g</div>
+      <div class="circle-value" id="fatValue">0 / 88g</div>
     </div>
   </div>
 </div>
@@ -166,7 +185,30 @@ h1 { font-size: 18px; }
   </div>
   <div class="fast-controls">
     <button class="fast-btn primary" id="fastStartBtn" onclick="toggleFast()">Start Fast</button>
+    <button class="fast-btn" onclick="toggleManualFast()">Set Start Time</button>
     <button class="fast-btn" onclick="resetFast()">Reset</button>
+  </div>
+  <div class="fast-manual" id="fastManual">
+    <h4>Set fast start time manually</h4>
+    <div class="fast-manual-row">
+      <label>Day:</label>
+      <select id="fastDay">
+        <option value="0">Today</option>
+        <option value="1">Yesterday</option>
+        <option value="2">2 days ago</option>
+      </select>
+    </div>
+    <div class="fast-manual-row">
+      <label>Time:</label>
+      <input type="number" id="fastHour" min="1" max="12" placeholder="HH" style="width:50px;">
+      <span class="time-sep">:</span>
+      <input type="number" id="fastMin" min="0" max="59" placeholder="MM" style="width:50px;">
+      <div class="ampm-toggle">
+        <button class="ampm-btn active" id="fastAM" onclick="setFastAMPM('AM')">AM</button>
+        <button class="ampm-btn" id="fastPM" onclick="setFastAMPM('PM')">PM</button>
+      </div>
+    </div>
+    <button class="primary-btn" onclick="applyManualFast()" style="margin-top:6px;">Apply</button>
   </div>
 </div>
 
@@ -186,7 +228,12 @@ h1 { font-size: 18px; }
       <button class="ampm-btn" id="ampmPM" onclick="setAMPM('PM')">PM</button>
     </div>
   </div>
-  <button class="primary-btn" id="addBtn" onclick="addCustomMeal()">Calculate &amp; Log</button>
+  <img class="photo-preview" id="photoPreview" />
+  <input type="file" id="photoInput" class="hidden-input" accept="image/*" capture="environment" onchange="handlePhoto(event)" />
+  <div class="button-row">
+    <button class="primary-btn" id="addBtn" onclick="addCustomMeal()" style="margin-top:0;">📝 Log from Text</button>
+    <button class="secondary-btn" id="photoBtn" onclick="document.getElementById('photoInput').click()">📷 Log from Photo</button>
+  </div>
 </div>
 
 <div class="suggest-card">
@@ -229,20 +276,15 @@ h1 { font-size: 18px; }
 <script>
 // ============================================================
 // SETUP: Replace this with YOUR Cloudflare Worker URL
-// (Looks like: https://meal-macros.yourname.workers.dev)
 // ============================================================
 const WORKER_URL = "https://mealtracker.bphusseyiii.workers.dev/";
 // ============================================================
 
-const DAY_TARGETS = {
-  work:    { label: "Work Day",     cal: 2590, protein: 233, fat: 81, carbs: 208 },
-  nonwork: { label: "Non-Work Day", cal: 2540, protein: 180, fat: 96, carbs: 230 },
-  rest:    { label: "Rest Day",     cal: 2100, protein: 135, fat: 80, carbs: 180 }
-};
+// Single set of targets — average of work/non-work
+const TARGETS = { cal: 2565, protein: 205, fat: 88, carbs: 220 };
 
 const REPORT_EMAIL = "bphusseyiii@gmail.com";
 
-// localStorage helpers (no window.storage on github pages)
 const STORAGE = {
   async get(key) {
     const v = localStorage.getItem(key);
@@ -263,6 +305,8 @@ let lastSuggestionDate = null;
 let lastSuggestionText = "";
 let mealAMPM = "AM";
 let weightAMPM = "AM";
+let fastManualAMPM = "AM";
+let pendingPhotoData = null;
 
 function getTodayKey() {
   const d = new Date();
@@ -312,7 +356,7 @@ async function saveSuggestion() { try { await STORAGE.set("tracker:suggestion", 
 
 function autoDetectDay() {
   const d = new Date().getDay();
-  if (d === 6) return "rest";
+  // Work days = Mon, Tue, Thu (1, 2, 4) — everything else is non-work
   if (d === 1 || d === 2 || d === 4) return "work";
   return "nonwork";
 }
@@ -363,12 +407,11 @@ function updateFastTimer() {
   }
   const elapsed = Date.now() - fastStart;
   document.getElementById("fastTime").textContent = formatDuration(elapsed);
-  const targetHrs = 15;
-  const progressHrs = elapsed / 3600000;
-  let meta;
-  if (progressHrs < targetHrs) meta = `${(targetHrs - progressHrs).toFixed(1)}h until 15h goal`;
-  else meta = `✓ Hit ${targetHrs}h goal · still fasting`;
-  document.getElementById("fastMeta").textContent = meta;
+  const startDate = new Date(fastStart);
+  const startStr = startDate.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  const sameDay = startDate.toDateString() === new Date().toDateString();
+  const dayLabel = sameDay ? "today" : startDate.toLocaleDateString("en-US", { weekday: "short" });
+  document.getElementById("fastMeta").textContent = `Started ${startStr} ${dayLabel}`;
   document.getElementById("fastStartBtn").textContent = "End Fast";
   document.getElementById("fastStartBtn").classList.remove("primary");
 }
@@ -391,6 +434,34 @@ async function resetFast() {
   if (!confirm("Reset the current fast timer? (Won't affect history)")) return;
   fastStart = null; await saveFast(); updateFastTimer();
 }
+function toggleManualFast() {
+  document.getElementById("fastManual").classList.toggle("open");
+}
+function setFastAMPM(val) {
+  fastManualAMPM = val;
+  document.getElementById("fastAM").classList.toggle("active", val === "AM");
+  document.getElementById("fastPM").classList.toggle("active", val === "PM");
+}
+async function applyManualFast() {
+  const dayOffset = parseInt(document.getElementById("fastDay").value);
+  const h = parseInt(document.getElementById("fastHour").value);
+  const m = parseInt(document.getElementById("fastMin").value) || 0;
+  if (!h || h < 1 || h > 12 || m < 0 || m > 59) { showToast("Enter a valid time"); return; }
+  let hour24 = h;
+  if (fastManualAMPM === "PM" && h !== 12) hour24 = h + 12;
+  if (fastManualAMPM === "AM" && h === 12) hour24 = 0;
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - dayOffset);
+  startDate.setHours(hour24, m, 0, 0);
+  if (startDate.getTime() > Date.now()) { showToast("Start time can't be in the future"); return; }
+  fastStart = startDate.getTime();
+  await saveFast();
+  document.getElementById("fastManual").classList.remove("open");
+  document.getElementById("fastHour").value = "";
+  document.getElementById("fastMin").value = "";
+  updateFastTimer();
+  showToast(`Fast set to start at ${startDate.toLocaleTimeString("en-US", { hour:"numeric", minute:"2-digit" })}`);
+}
 function setAMPM(val) {
   mealAMPM = val;
   document.getElementById("ampmAM").classList.toggle("active", val === "AM");
@@ -407,28 +478,37 @@ function buildTimeLabel(hour, min, ampm) {
   if (h < 1 || h > 12 || m < 0 || m > 59) return null;
   return `${h}:${String(m).padStart(2,"0")} ${ampm}`;
 }
+function getCurrentTimeLabel() {
+  const now = new Date();
+  const h = now.getHours(); const m = now.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 || 12;
+  return `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
+}
 
 function render() {
   document.querySelectorAll(".day-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.day === currentDay);
   });
-  // Check setup warning
   if (WORKER_URL === "WORKER_URL_HERE" || !WORKER_URL) {
     document.getElementById("setupWarning").style.display = "block";
   }
   const customList = document.getElementById("customMealsList");
   customList.innerHTML = "";
   if (customMeals.length === 0) {
-    customList.innerHTML = '<div class="empty-state">No meals logged yet — use the form below to log what you eat throughout the day.</div>';
+    customList.innerHTML = '<div class="empty-state">No meals logged yet — use the form below.</div>';
   } else {
     customMeals.forEach((meal, idx) => {
       const card = document.createElement("div");
-      card.className = "meal-card" + (meal.checked ? "" : " unchecked");
+      const isPhoto = meal.fromPhoto;
+      card.className = "meal-card" + (meal.checked ? "" : " unchecked") + (isPhoto ? " photo" : "");
       const timeLabel = meal.time || "Logged";
+      const badgeClass = isPhoto ? "meal-time-badge photo" : "meal-time-badge";
+      const badgeText = isPhoto ? `📷 ${timeLabel}` : timeLabel;
       card.innerHTML = `
         <div class="checkbox ${meal.checked ? "checked" : ""}" onclick="toggleCustomMeal(${idx})"></div>
         <div class="meal-content">
-          <div class="meal-header"><span class="meal-time-badge">${timeLabel}</span><button class="delete-btn" onclick="deleteCustomMeal(${idx})">✕</button></div>
+          <div class="meal-header"><span class="${badgeClass}">${badgeText}</span><button class="delete-btn" onclick="deleteCustomMeal(${idx})">✕</button></div>
           <div class="meal-name">${meal.name}</div>
           <div class="meal-desc">${meal.desc || ""}</div>
           <div class="meal-macros">${meal.macros.cal} cal · ${meal.macros.protein}P · ${meal.macros.fat}F · ${meal.macros.carbs}C</div>
@@ -438,7 +518,7 @@ function render() {
     });
   }
   const totals = calculateTotals();
-  const tg = DAY_TARGETS[currentDay];
+  const tg = TARGETS;
   document.getElementById("totalCal").textContent = totals.cal.toLocaleString();
   document.getElementById("targetCal").textContent = tg.cal.toLocaleString();
   document.getElementById("proteinValue").textContent = `${totals.protein} / ${tg.protein}g`;
@@ -485,21 +565,22 @@ function resetDay() {
   customMeals = []; saveDayState(); render(); showToast("Day reset");
 }
 
-async function callGemini(prompt, maxTokens) {
+async function callGemini(prompt, maxTokens, imageBase64) {
   if (WORKER_URL === "WORKER_URL_HERE" || !WORKER_URL) {
     throw new Error("Worker URL not configured");
   }
+  const body = { prompt: prompt, maxTokens: maxTokens || 500 };
+  if (imageBase64) body.imageBase64 = imageBase64;
   const response = await fetch(WORKER_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt: prompt, maxTokens: maxTokens || 500 })
+    body: JSON.stringify(body)
   });
   if (!response.ok) {
     const errText = await response.text();
     throw new Error(`API error: ${response.status} ${errText}`);
   }
   const data = await response.json();
-  // Gemini response structure
   const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
   return text.trim();
 }
@@ -524,18 +605,13 @@ Food: ${text}`;
     resultText = resultText.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(resultText);
 
-    let timeLabel = buildTimeLabel(hourInput.value, minInput.value, mealAMPM);
-    if (!timeLabel) {
-      const now = new Date();
-      const h = now.getHours(); const m = now.getMinutes();
-      const ampm = h >= 12 ? "PM" : "AM";
-      const h12 = h % 12 || 12;
-      timeLabel = `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
-    }
+    const timeLabel = buildTimeLabel(hourInput.value, minInput.value, mealAMPM) || getCurrentTimeLabel();
+
     customMeals.push({
       name: parsed.name, desc: parsed.desc, time: timeLabel, loggedAt: new Date().toISOString(),
       macros: { cal: Math.round(parsed.cal), protein: Math.round(parsed.protein), fat: Math.round(parsed.fat), carbs: Math.round(parsed.carbs) },
-      checked: true
+      checked: true,
+      fromPhoto: false
     });
     await saveDayState();
     input.value = ""; hourInput.value = ""; minInput.value = "";
@@ -546,7 +622,72 @@ Food: ${text}`;
     showToast("Error: " + (err.message || "try again"));
   } finally {
     btn.disabled = false;
-    btn.innerHTML = "Calculate &amp; Log";
+    btn.innerHTML = "📝 Log from Text";
+  }
+}
+
+function handlePhoto(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    pendingPhotoData = e.target.result; // data URL
+    const preview = document.getElementById("photoPreview");
+    preview.src = pendingPhotoData;
+    preview.classList.add("show");
+    // Auto-submit when photo is selected
+    logFromPhoto();
+  };
+  reader.readAsDataURL(file);
+}
+
+async function logFromPhoto() {
+  if (!pendingPhotoData) { showToast("Take a photo first"); return; }
+  const hourInput = document.getElementById("timeHour");
+  const minInput = document.getElementById("timeMin");
+
+  const photoBtn = document.getElementById("photoBtn");
+  photoBtn.disabled = true;
+  photoBtn.innerHTML = '<span class="spinner"></span>Analyzing...';
+
+  try {
+    // Strip data URL prefix to get base64
+    const base64 = pendingPhotoData.split(",")[1];
+
+    const prompt = `Analyze this food photo and estimate the macros. Return ONLY valid JSON, no markdown, no code fences, no explanation:
+{"name": "short name 3-6 words identifying the food", "desc": "brief description of what you see", "cal": <integer>, "protein": <integer grams>, "fat": <integer grams>, "carbs": <integer grams>}
+
+If you cannot identify food in the image, return: {"name": "Unknown", "desc": "Could not identify food", "cal": 0, "protein": 0, "fat": 0, "carbs": 0}`;
+
+    let resultText = await callGemini(prompt, 500, base64);
+    resultText = resultText.replace(/```json|```/g, "").trim();
+    const parsed = JSON.parse(resultText);
+
+    if (parsed.name === "Unknown") {
+      showToast("Couldn't identify food in photo");
+      return;
+    }
+
+    const timeLabel = buildTimeLabel(hourInput.value, minInput.value, mealAMPM) || getCurrentTimeLabel();
+    customMeals.push({
+      name: parsed.name, desc: parsed.desc, time: timeLabel, loggedAt: new Date().toISOString(),
+      macros: { cal: Math.round(parsed.cal), protein: Math.round(parsed.protein), fat: Math.round(parsed.fat), carbs: Math.round(parsed.carbs) },
+      checked: true,
+      fromPhoto: true
+    });
+    await saveDayState();
+    hourInput.value = ""; minInput.value = "";
+    pendingPhotoData = null;
+    document.getElementById("photoPreview").classList.remove("show");
+    document.getElementById("photoInput").value = "";
+    render();
+    showToast(`Photo logged at ${timeLabel}: ${parsed.cal} cal · ${parsed.protein}g P`);
+  } catch (err) {
+    console.error(err);
+    showToast("Error: " + (err.message || "try again"));
+  } finally {
+    photoBtn.disabled = false;
+    photoBtn.innerHTML = "📷 Log from Photo";
   }
 }
 
@@ -556,14 +697,7 @@ async function logWeight() {
   const minInput = document.getElementById("weightMin");
   const val = parseFloat(input.value);
   if (!val || val < 50 || val > 500) { showToast("Enter a valid weight"); return; }
-  let timeLabel = buildTimeLabel(hourInput.value, minInput.value, weightAMPM);
-  if (!timeLabel) {
-    const now = new Date();
-    const h = now.getHours(); const m = now.getMinutes();
-    const ampm = h >= 12 ? "PM" : "AM";
-    const h12 = h % 12 || 12;
-    timeLabel = `${h12}:${String(m).padStart(2,"0")} ${ampm}`;
-  }
+  const timeLabel = buildTimeLabel(hourInput.value, minInput.value, weightAMPM) || getCurrentTimeLabel();
   weights.push({ date: new Date().toISOString(), lbs: val, time: timeLabel });
   await saveWeights();
   input.value = ""; hourInput.value = ""; minInput.value = "";
@@ -627,24 +761,26 @@ async function generateWeeklyReport() {
 
   const dateRange = `${days[0].date.toLocaleDateString("en-US",{month:"short",day:"numeric"})} - ${days[6].date.toLocaleDateString("en-US",{month:"short",day:"numeric"})}`;
   let body = `WEEKLY MEAL TRACKER REPORT\n${dateRange}\n${"=".repeat(40)}\n\n`;
+  body += `TARGETS: ${TARGETS.cal} cal | ${TARGETS.protein}P | ${TARGETS.fat}F | ${TARGETS.carbs}C\n\n`;
   body += `WEEKLY AVERAGES (logged days only)\n  Calories: ${avgCal}\n  Protein:  ${avgP}g\n  Fat:      ${avgF}g\n  Carbs:    ${avgC}g\n\n`;
   body += `DAY-BY-DAY BREAKDOWN\n${"-".repeat(40)}\n`;
   days.forEach(d => {
     const dayName = d.date.toLocaleDateString("en-US",{weekday:"short",month:"numeric",day:"numeric"});
-    const dayLabel = DAY_TARGETS[d.dayType] ? DAY_TARGETS[d.dayType].label : "?";
+    const dayLabel = d.dayType === "work" ? "Work" : d.dayType === "nonwork" ? "Non-Work" : "?";
     body += `\n${dayName} (${dayLabel})\n`;
     if (d.totals.cal === 0) body += `  No meals logged\n`;
     else {
       body += `  Cal: ${d.totals.cal} | P: ${d.totals.protein}g | F: ${d.totals.fat}g | C: ${d.totals.carbs}g\n  Meals:\n`;
       d.meals.filter(m => m.checked).forEach(m => {
-        body += `    - ${m.time || "?"} - ${m.name} (${m.macros.cal} cal, ${m.macros.protein}P)\n`;
+        const tag = m.fromPhoto ? " [photo]" : "";
+        body += `    - ${m.time || "?"} - ${m.name}${tag} (${m.macros.cal} cal, ${m.macros.protein}P)\n`;
       });
     }
   });
   body += `\n${"-".repeat(40)}\nFASTING (past 7 days)\n  Completed fasts: ${fastCount}\n  Average duration: ${avgFastHrs}h\n`;
   if (recentFasts.length > 0) {
     body += `  Recent fasts:\n`;
-    recentFasts.slice(-5).forEach(f => {
+    recentFasts.slice(-7).forEach(f => {
       const start = new Date(f.start); const end = new Date(f.end);
       body += `    - ${start.toLocaleDateString("en-US",{month:"numeric",day:"numeric"})} ${start.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})} → ${end.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})} (${(f.durationMin/60).toFixed(1)}h)\n`;
     });
@@ -674,7 +810,6 @@ function showToast(msg) {
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 3000);
 }
-
 function maybeRefreshSuggestion() {
   if (lastSuggestionDate !== getTodayKey()) {
     if (lastSuggestionDate) {
